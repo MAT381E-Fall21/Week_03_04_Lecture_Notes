@@ -1,0 +1,112 @@
+---
+title: 'Week 2: Examples for Data Tidying'
+---
+
+
+# Revisit Population data obtained from http://transmonee.org/database/
+
+# Visit at the web site of Monitoring the situation of 
+# children and women in Europe and Central Asia
+# at http://transmonee.org/
+# Go to http://transmonee.org/database/ and 
+# Download Excel file named
+# "Population at the beginning of the year by sex and selected age groups"
+# into to your working directory and rename it as Population-1989-2015
+# since the file name is very long.
+
+
+```{r}
+library(readxl)
+pop_red <- read_excel("data/Population-1989-2015.xlsx", range = cell_rows(5:39))
+View(pop_red)
+```
+
+# Column 1 and 2 does not have names.
+
+# Investigate the data
+
+```{r}
+str(pop_red)
+```
+
+# Did you notice any problem?
+
+# The variables 1989-1999 and 2008-2015 are character variables
+# What is the reason for it? 
+# Actually they should have been numeric!..
+
+# There are empty rows in the sheet and they are denoted by NA in data viewer panel
+# There are missing values in the sheet and they are denoted by "-" in the sheet as well as in the data
+# viewer panel.
+# We do not need the second column is not needed.
+
+# First drop all the rows which are completely missing
+
+# drop_na() drops rows who are missing at all columns--complete case analysis
+
+```{r}
+pop_red_tidy <- pop_red %>%
+                 drop_na() %>% 
+View(pop_red_tidy)
+```
+
+```{r}
+str(pop_red_tidy)
+```
+
+
+# Rename the first column as "Country", drop the second column, and
+# sorty by Country
+
+
+```{r}
+pop_red_tidy_more <- pop_red_tidy %>%
+                      drop_na() %>% 
+                      rename("Country"="...1") %>%
+                      select(-"...2") %>% 
+                      arrange(Country) 
+            
+View(pop_red_tidy_more)
+```
+
+
+# Investigate the data
+
+```{r}
+str(pop_red_tidy_more)
+```
+
+# We need to replace "-" with "NA".
+
+```{r}
+pop_red_withna <- pop_red_tidy_more %>% 
+                  na_if("-") #from dplyr
+
+View(pop_red_withna)
+```
+
+```{r}
+str(pop_red_withna)
+```
+
+# Except the Country column, convert character variables
+# into numeric variables
+
+```{r}
+pop_red_tidy_tidy <- pop_red_withna %>% 
+                     mutate_at(vars("1989":"2015"), as.numeric) 
+str(pop_red_tidy_tidy)
+View(pop_red_tidy_tidy)                  
+```                    
+
+
+# Lastly, turn this data into long format so that
+# We can use it later (for visualization etc)
+
+
+```{r}
+pop_red_long <- pop_red_tidy_tidy %>% 
+                pivot_longer(!Country, names_to="Year", values_to="Population")
+View(pop_red_long)
+```
+

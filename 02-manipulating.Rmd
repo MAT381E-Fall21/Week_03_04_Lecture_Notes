@@ -1,0 +1,493 @@
+---
+title: "Week 2: Examples for Data Manipulating"
+---
+
+
+# Load tidyverse
+```{r, warning=F, message=F}
+library(tidyverse)
+options(dplyr.print_max = 1e9)
+```
+
+# Check the current directory
+```{r}
+getwd()
+```
+
+# Read in the data on EPI2020 Results
+# Country scores, 10-year changes, and ranks
+# The data is originally available at https://epi.yale.edu/downloads/epi2020resultsregions20200604.csv
+# Click on the epi_data variable in the "Environment" tab or
+# Run the View() function.
+
+```{r}
+epi_data <- read_csv("data/epi2020resultsregions20200604.csv") 
+View(epi_data)
+```
+
+```{r}
+str(epi_data)
+```
+
+# For the interpretation of indicators,
+# have a look at the epi2020indicatortla20200604.csv file.
+
+
+#### Filter() ####
+
+# filter() lets us to apply comparison 
+# operators to subset data.
+# We can filter character variables based on their values. 
+
+# Let's filter Eastern European countries from the data.
+# region is a character variable
+
+```{r}
+epi_data %>% 
+  filter(region == "Eastern Europe") %>% 
+  View()
+
+```
+
+
+# Similarly we can use the other operators:
+# Exclude Eastern European countries from the data.
+# Remember %>% operator does not save the object, you need
+# to assign RHS to LHS.
+
+```{r}
+epi_data %>% 
+  filter(region != "Eastern Europe") %>% 
+  View()
+```
+
+ 
+# If we want to select "more than one region" we can use the %in% operator.
+# Filter regions Eastern Europe and Asia-Pacific
+
+```{r}
+epi_data %>%
+  filter(region %in% c("Asia-Pacific", "Eastern Europe")) %>%
+  View()
+```
+
+# We can use the %in% operator to deselect certain groups as well, 
+# in this case we have to negate by adding an exclamation mark (Boolean operator)
+# at the beginning of your filter.
+
+```{r}
+epi_data %>%
+  filter(!region %in% c("Asia-Pacific", "Eastern Europe")) %>%
+   View()
+```
+
+# We can filter numeric variables based on their values too. 
+# The most used operators for this are >, >=, <, <=, == and !=
+
+# Filter countries whose EPI.new score is less than 
+# or equal to 50!..
+
+
+```{r}
+epi_data %>%
+  filter(EPI.new <= 50) %>%
+   View()
+```
+
+# Multiple conditions
+# filter(condition1, condition2) will return rows where both conditions are met.
+# Let's combine multiple conditions in the same call.
+
+# Filter countries whose EPI.new score is between 50 and 60!..   2) 50 <= EPI  & 1)EPI <= 60
+
+
+```{r}
+epi_data %>%
+  filter(50 <= EPI.new & EPI.new <= 60) %>%
+   View()
+```
+
+# or use helper function between() 
+
+```{r}
+epi_data %>%
+  filter(between(EPI.new, 50, 60)) %>%
+   View()
+```
+
+
+# Filter Eastern Eruropean countries whose EPI.new score is less than 
+# or equal to 50!..
+
+```{r}
+epi_data %>%
+  filter(region == "Eastern Europe" & EPI.new <= 50) %>%
+   View()
+```
+
+# You can use , and & interchangeably in filter(). 
+
+```{r}
+epi_data %>%
+  filter(region == "Eastern Europe" & EPI.new <= 50) %>%
+   View()
+```
+
+# Filter Asia-Pacific countries whos EPI score is greater than the grand mean.
+
+
+```{r}
+epi_data %>%
+  filter(region == "Asia-Pacific", EPI.new > mean(EPI.new)) %>%
+   View()
+```
+
+# Multiple AND, OR and NOT conditions can be combined.
+
+# Filter out Eastern Eropean countries whose EPI.new score is less than 
+# or equal to 50 and AIR.new score is greater 40.
+
+```{r}
+epi_data %>%
+  filter(region == "Eastern Europe", EPI.new <= 50 , AIR.new > 40) %>%
+   View()
+```
+
+# Make sure to use parentheses when combining several logical operators 
+# to indicate which logical operation should be performed first.
+
+# Practice at home!
+# To filter out empty rows, you negate the is.na() function inside a filter:
+# The sample code will remove any rows where the specified column is NA.
+
+# Revisit : At home: 
+
+```{r}
+cth_data <- read_csv("data/CTH_raw_na.csv") 
+View(cth_data)
+```
+
+```{r}
+dim(cth_data)
+```
+
+
+```{r}
+cth_data_filtered <- cth_data %>%
+                     filter(is.na(CTH.raw.1950))
+
+```
+
+```{r}
+dim(cth_data_filtered)
+```
+
+#### Select() ####
+
+# select() allows us to select a subset of the columns in the data frame.
+# To select a few columns just add their names in the select statement. 
+# The order in which you add them, will determine the order in which 
+# they appear in the output.
+
+
+```{r}
+epi_data %>%
+  select(code, iso, country, region, EPI.new, AIR.new) %>%
+  View()
+```
+
+# : for selecting a range of consecutive variables.
+# ! for taking the complement of a set of variables.
+# & and | for selecting the intersection or the union of two sets of variables.
+# c() for combining selections.
+# or
+# We can select multiple columns using the (from:to) syntax:
+
+```{r}
+epi_data %>%
+  select(code:AIR.new) %>%
+  View()
+```
+
+# We can also deselect (multiple) columns
+# by adding a minus sign in front of the column name. 
+# You can also deselect blocks of columns.
+
+
+```{r}
+epi_data %>%
+  select(-HLT.new,-(PMD.new:WWT.rgn.rank)) %>%
+  View()
+```
+
+
+# If we have a lot of columns with a similar structure,
+# we can use partial matching by adding 
+# starts_with():starts with a prefix, 
+# ends_with():ends with a prefix or 
+# contains():contains a literal string in your select statement.
+
+
+
+
+```{r}
+epi_data %>%
+  select(code, iso, country, region, starts_with("AIR")) %>%
+  View()
+```
+
+
+
+```{r}
+epi_data %>%
+  select(code, iso, country, region, ends_with("new")) %>%
+  View()
+```
+
+```{r}
+my_Reduced <- epi_data %>% 
+              select(code, iso, country, region, contains("EPI")) 
+View(my_Reduced)            
+```
+
+
+# everythin() omitted
+
+# Or use a variable for column selection:
+# You can set up column names upfront, and 
+# then refer to them inside a select() statement by either wrapping 
+# them inside one_of() or by using the !! operator.
+
+```{r}
+columns <- c("code", "iso", "country", "region", "EPI.new", "AIR.new")  
+epi_data %>% 
+  select(one_of(columns)) %>% 
+  View()
+```
+
+
+
+```{r}
+columns <- c("code", "iso", "country", "region", "EPI.new", "AIR.new")  
+
+epi_data %>%
+  select(one_of(columns)) %>%
+  #select(!!(columns)) %>% #the same with previous command
+ View()
+```
+  
+# If you will be using a select() statement, you can rename straight in the select function.
+
+
+```{r}
+epi_data %>%
+  select(code, iso, country, region, EPI = EPI.new, AIR = AIR.new) %>%
+  View()
+```
+
+# rename() renames column names.
+# The new variable names goes on the LHS of the = sign, 
+# and the old name on the RHS.
+
+
+```{r}
+epi_data %>%
+  select(code, iso, country, region, EPI.new, AIR.new) %>%
+  rename(EPI = EPI.new, AIR = AIR.new) %>%
+  View()
+```
+
+# More: 
+# To rename all variables at the same time use set_names():
+
+#### Arrange() ####
+
+# arrange() allows us to sort the values in a data frame by one or more column entries.
+
+# Sort the data according to the EPI.new variable in ascending order
+
+```{r}
+epi_data %>% 
+  arrange(EPI.new) %>% 
+  View()
+```
+
+# Sort the data according to the EPI.new variable in descending order
+
+```{r}
+epi_data %>%
+  arrange(-EPI.new)
+  View()
+```
+
+# or use desc() within arrange()
+
+```{r}
+epi_data %>%
+  arrange(desc(EPI.new))
+  View()
+```
+
+
+EPI_standard = (EPI.new-mean(EPI.new)) / sd(EPI.new)
+
+#### Mutate() ####
+
+# You can make new columns with the mutate() function. 
+# The options inside mutate are "almost endless": pretty much anything that 
+# you can do to normal vectors, can be done inside a mutate() function.
+
+# Anything inside mutate can either be a new column (by giving mutate a new column name),
+# or can replace the current column (by keeping the same column name).
+
+# Let's standardize the EPI.new variable
+
+```{r}
+epi_data %>%
+  mutate(EPI.stand = (EPI.new-mean(EPI.new))/sd(EPI.new)) %>%
+  select(code, iso, country, EPI.stand) %>%
+  View()
+```
+
+# Note: We can add multiple columns as part of one mutate call.
+
+# The ifelse() statement can be used to turn a numeric column 
+# into a categoric one with two levels. 
+# ifelse() takes a logical expression, then what to do if the expression 
+# returns TRUE and lastly what to do when it returns FALSE.
+
+
+```{r}
+epi_data %>% 
+  mutate(EPI.cat = ifelse(EPI.new >=50,"Good","Bad")) %>% 
+  select(country, EPI.new, EPI.cat) %>% 
+  View
+```
+
+```{r}
+epi_data %>%
+  mutate(EPI.cat = ifelse(EPI.new >= 50,"Good","Bad")) %>%
+  select(code, iso, country, EPI.cat) %>%
+  View()
+```
+
+# The ifelse() can be nested but if you want more than two levels, 
+# but it might be even easier to use case_when() which allows as many 
+# statements as you like and is easier to read than many nested ifelse statements.
+
+# "The arguments are evaluated in order", so only the rows where the first statement 
+# is not true will continue to be evaluated for the next statement. 
+# For everything that is left at the end just use the TRUE ~ "newname".
+
+EPI.cat such that EPI.new >= 75, "Very Good"
+                  EPI.new >= 50, "Good"
+                  EPI.new < 50, "Not Good"
+
+
+```{r}
+epi_data %>%
+  mutate(EPI.cat = case_when(EPI.new >= 75 ~ "Very Good",
+                             EPI.new >= 50 ~ "Good",
+                             TRUE ~ "Not Good")) %>%
+  select(EPI.new, country, EPI.cat) %>%
+  View()
+```
+
+
+
+
+
+#### Summarize() ####
+
+# If we just want to produce summaries of 
+# the average, sum, standard deviation, minimum, maximum of the data, 
+# we need summarise().
+# To use the function we just add our new column name, 
+# and after the equal sign the mathematics of what needs to happen: 
+# column_name = function(variable). 
+
+# Useful functions (from https://dplyr.tidyverse.org/reference/summarise.html)
+# Center: mean(), median()
+# Spread: sd() (standard deviation)
+# Range: min(), max()
+# Position: first(), last(), nth()
+# Count: n(), n_distinct()
+# n(): gives the number of observations
+# n_distinct(): gives the numbers of unique values of the variable.
+# You can add multiple summary functions behind each other.
+
+
+```{r}
+epi_data %>%
+  summarize(nrow = n(), avgEPI = mean(EPI.new), sdHLT = sd(HLT.new), maxAIR = max(AIR.new)) %>%
+  View()
+```
+
+#### Group_by() / Summarise() ####
+
+# In most cases, we don’t just want to summarise the whole data table, 
+# but we want to get summaries by a group. 
+# To do this, you first need to specify by which variable(s)
+# you want to divide the data using group_by(). 
+# You can add one of more variables as arguments in group_by().
+
+# These two verbs always go together. group_by() doesn’t do anything by itself, 
+# output wise. But what it does is split our data frame into a number of 
+# smaller data.frames split out by category. 
+# Then we use summarize to do some sort of summary calculation 
+# (such as counting or calculating the mean) on these smaller data.frames:
+
+# Calculate the average EPI.new scores across regions and the number of
+# countries in each region. Then sort the data according to
+# average EPI score in descending order.
+
+
+
+```{r}
+epi_data %>%
+  group_by(region) %>%
+  summarize(n = n()) %>%
+  View()
+```
+
+```{r}
+epi_data %>%
+  group_by(region) %>%
+  summarize(n = n(), avgEPIreg = round(mean(EPI.new), 2)) %>%
+  arrange(-avgEPIreg) %>%
+  View()
+```
+
+# shorcut: group_by()%>%summarize(n = n()) = count()
+
+```{r}
+epi_data %>%
+  count(region) %>%
+  View()
+```
+
+
+```{r}
+epi_data %>%
+  count(region) %>%
+  mutate(prop = n /sum(n) * 100) %>%
+  View()
+```
+
+
+# Side note: we can also group by **more than one** variable .
+
+# Final notes:
+# The package **`dplyr`** provides convenient tools for the most common data manipulation
+# tasks. It is built to work directly with data frames, with many common tasks
+# optimized by being written in a compiled language (C++). An additional feature is the
+# ability to work directly with data stored in an external database. The benefits of
+# doing this are that the data can be managed natively in a relational database,
+# queries can be conducted on that database, and only the results of the query are
+# returned.
+
+# This addresses a common problem with R in that all operations are conducted
+# in-memory and thus the amount of data you can work with is limited by available
+# memory. The database connections essentially remove that limitation in that you
+# can have a database of many 100s GB, conduct queries on it directly, and pull
+# back into R only what you need for analysis.
