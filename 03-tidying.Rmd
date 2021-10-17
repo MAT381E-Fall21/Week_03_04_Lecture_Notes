@@ -1,5 +1,5 @@
 ---
-title: 'Week 2: Examples for Data Tidying'
+title: 'Week 03: Examples for Data Tidying'
 ---
 
 
@@ -17,7 +17,7 @@ title: 'Week 2: Examples for Data Tidying'
 
 ```{r}
 library(readxl)
-pop_red <- read_excel("data/Population-1989-2015.xlsx", range = cell_rows(5:39))
+pop_red <- read_excel("data/Population-1989-2019.xlsx", range = cell_rows(5:40))
 View(pop_red)
 ```
 
@@ -31,22 +31,23 @@ str(pop_red)
 
 # Did you notice any problem?
 
-# The variables 1989-1999 and 2008-2015 are character variables
+# The variables 1989-2015 are character variables
 # What is the reason for it? 
 # Actually they should have been numeric!..
 
 # There are empty rows in the sheet and they are denoted by NA in data viewer panel
 # There are missing values in the sheet and they are denoted by "-" in the sheet as well as in the data
 # viewer panel.
-# We do not need the second column is not needed.
+# We do not need the second column.
 
 # First drop all the rows which are completely missing
 
-# drop_na() drops rows who are missing at all columns--complete case analysis
+# drop_na() drops rows which are missing at all columns--complete case analysis
 
 ```{r}
+library(tidyr)
 pop_red_tidy <- pop_red %>%
-                 drop_na() %>% 
+                 drop_na() 
 View(pop_red_tidy)
 ```
 
@@ -94,8 +95,12 @@ str(pop_red_withna)
 
 ```{r}
 pop_red_tidy_tidy <- pop_red_withna %>% 
-                     mutate_at(vars("1989":"2015"), as.numeric) 
+                     mutate_at(vars("1989":"2019"), as.numeric) 
 str(pop_red_tidy_tidy)
+``` 
+
+```{r}
+
 View(pop_red_tidy_tidy)                  
 ```                    
 

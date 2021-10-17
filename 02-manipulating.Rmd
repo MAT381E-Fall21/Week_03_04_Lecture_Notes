@@ -1,7 +1,6 @@
 ---
-title: "Week 2: Examples for Data Manipulating"
+title: 'Week 03: Examples for Data Manipulating'
 ---
-
 
 # Load tidyverse
 ```{r, warning=F, message=F}
@@ -46,7 +45,6 @@ str(epi_data)
 epi_data %>% 
   filter(region == "Eastern Europe") %>% 
   View()
-
 ```
 
 
@@ -129,7 +127,7 @@ epi_data %>%
 
 ```{r}
 epi_data %>%
-  filter(region == "Eastern Europe" & EPI.new <= 50) %>%
+  filter(region == "Eastern Europe" , EPI.new <= 50) %>%
    View()
 ```
 
@@ -175,7 +173,6 @@ dim(cth_data)
 ```{r}
 cth_data_filtered <- cth_data %>%
                      filter(is.na(CTH.raw.1950))
-
 ```
 
 ```{r}
@@ -196,11 +193,7 @@ epi_data %>%
   View()
 ```
 
-# : for selecting a range of consecutive variables.
-# ! for taking the complement of a set of variables.
-# & and | for selecting the intersection or the union of two sets of variables.
-# c() for combining selections.
-# or
+
 # We can select multiple columns using the (from:to) syntax:
 
 ```{r}
@@ -208,6 +201,12 @@ epi_data %>%
   select(code:AIR.new) %>%
   View()
 ```
+
+# A side note:
+# ! for taking the complement of a set of variables.
+# & and | for selecting the intersection or the union of two sets of variables.
+# c() for combining selections.
+
 
 # We can also deselect (multiple) columns
 # by adding a minus sign in front of the column name. 
@@ -223,11 +222,9 @@ epi_data %>%
 
 # If we have a lot of columns with a similar structure,
 # we can use partial matching by adding 
-# starts_with():starts with a prefix, 
-# ends_with():ends with a prefix or 
-# contains():contains a literal string in your select statement.
-
-
+# starts_with(): starts with a prefix, 
+# ends_with(): ends with a prefix or 
+# contains(): contains a literal string in your select statement.
 
 
 ```{r}
@@ -235,7 +232,6 @@ epi_data %>%
   select(code, iso, country, region, starts_with("AIR")) %>%
   View()
 ```
-
 
 
 ```{r}
@@ -251,8 +247,6 @@ View(my_Reduced)
 ```
 
 
-# everythin() omitted
-
 # Or use a variable for column selection:
 # You can set up column names upfront, and 
 # then refer to them inside a select() statement by either wrapping 
@@ -265,14 +259,14 @@ epi_data %>%
   View()
 ```
 
-
+#everything() within select(), selects everything
 
 ```{r}
 columns <- c("code", "iso", "country", "region", "EPI.new", "AIR.new")  
 
 epi_data %>%
-  select(one_of(columns)) %>%
-  #select(!!(columns)) %>% #the same with previous command
+  ##select(one_of(columns)) %>%
+  select(!!(columns)) %>% #the same with previous command
  View()
 ```
   
@@ -329,8 +323,6 @@ epi_data %>%
 ```
 
 
-EPI_standard = (EPI.new-mean(EPI.new)) / sd(EPI.new)
-
 #### Mutate() ####
 
 # You can make new columns with the mutate() function. 
@@ -364,15 +356,9 @@ epi_data %>%
   View
 ```
 
-```{r}
-epi_data %>%
-  mutate(EPI.cat = ifelse(EPI.new >= 50,"Good","Bad")) %>%
-  select(code, iso, country, EPI.cat) %>%
-  View()
-```
 
 # The ifelse() can be nested but if you want more than two levels, 
-# but it might be even easier to use case_when() which allows as many 
+# then it might be even easier to use case_when() which allows as many 
 # statements as you like and is easier to read than many nested ifelse statements.
 
 # "The arguments are evaluated in order", so only the rows where the first statement 
@@ -392,8 +378,6 @@ epi_data %>%
   select(EPI.new, country, EPI.cat) %>%
   View()
 ```
-
-
 
 
 
@@ -450,6 +434,15 @@ epi_data %>%
   View()
 ```
 
+# shorcut: group_by()%>%summarize(n = n()) = count()
+
+```{r}
+epi_data %>%
+  count(region) %>%
+  View()
+```
+
+
 ```{r}
 epi_data %>%
   group_by(region) %>%
@@ -458,13 +451,6 @@ epi_data %>%
   View()
 ```
 
-# shorcut: group_by()%>%summarize(n = n()) = count()
-
-```{r}
-epi_data %>%
-  count(region) %>%
-  View()
-```
 
 
 ```{r}

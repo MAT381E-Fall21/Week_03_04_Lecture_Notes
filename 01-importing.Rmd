@@ -1,6 +1,6 @@
 
 ---
-title: 'Week 2: Examples for Data Importing'
+title: 'Week 03: Examples for Data Importing'
 ---
 
 # Load packages
@@ -17,10 +17,18 @@ getwd()
 ```
 
 # Visit Environmental Performance Index at https://epi.yale.edu/
+
+# The Environmental Performance Index (EPI) ranks 180 countries on 32 performance indicators across 11 issue  
+# categories covering environmental health and ecosystem vitality. 
+# Specifically, environmental performance indicators (EPIs) examine environmental issues such as pollution, biodiversity, climate, # energy, erosion, ecosystem services, environmental education, and many others. 
+
+#####This year, Denmark ranks #1 in the EPI#####
+## https://epi.yale.edu/downloads/epipolicymakersummaryr11.pdf
+
 # Go to "Downloads > EPI2020Raw data"
 # https://epi.yale.edu/downloads/epi2020rawdata20200604v02.zip
 # Download this file to your Desktop and unzip this file. 
-# Focus on CTH_raw_na file and move this file to data folder uder your working directory
+# Focus on CTH_raw_na file and move this file to data folder under your working directory
 
 ```{r}
 # move the file to working directory
@@ -33,6 +41,7 @@ list.files(file.path(getwd(), "data"))
 
 # CTH_raw_na is a csv file 
 # Have a look at the first three lines of the CTH data
+
 ```{r}
 # read_lines is a function from readr package
 # ?read_lines
@@ -54,9 +63,11 @@ read_lines("data/CTH_raw_na.csv", n_max=3)
 # Read the data into R console
 cth_data <- read_csv("data/CTH_raw_na.csv")
 ```
+
 # When everything is OK, you will see your data under Environement section
+
 ```{r}
-# Inverstigate data carefully
+# Investigate data carefully
 View(cth_data)
 ```
 
@@ -137,32 +148,40 @@ library(readxl)
 # Go to http://transmonee.org/database/ and 
 # Download Excel file named
 # "Population at the beginning of the year by sex and selected age groups"
-# into to your working directory and rename it as Population-1989-2015
+# into to your working directory and rename it as Population-1989-2019
 # since the file name is very long.
 
 ```{r}
 # List the sheet names
-excel_sheets("data/Population-1989-2015.xlsx")
+excel_sheets("data/Population-1989-2019.xlsx")
 ```
+
 # read_excel() reads both xls and xlsx files and detects the format from the extension.
+
 ```{r}
-pop <- read_excel("data/Population-1989-2015.xlsx")
+pop <- read_excel("data/Population-1989-2019.xlsx")
 View(pop)
 ```
+
 # The excel file is very crowded. It consists of many tables and notes in text format
 # Let's focus on Total population on January 1 which is located between 5th and
-# 39th rows. Note that the 5th row is a heading.
+# 40th rows. Note that the 5th row is a heading.
+
 ```{r}
-pop_red <- read_excel("data/Population-1989-2015.xlsx", range = cell_rows(5:39))
+# By default, it prints the first sheet
+pop_red <- read_excel("data/Population-1989-2019.xlsx", range = cell_rows(5:40))
+View(pop_red)
+```
+
+```{r}
 colnames(pop_red)[1:2] <- c("Country", "Number")
 View(pop_red)
 ```
+
 # Now it seems a bit OK! Since new data set still involves
 # a few empty rows!..We can get rid of these rows
 # when we are familiar with dplyr package. 
 
-
-# However, how about you have a very big data set?
 # Maybe, it is better to get more help from 
 # https://readxl.tidyverse.org/articles/sheet-geometry.html
 # https://readxl.tidyverse.org/articles/cell-and-column-types.html
@@ -194,6 +213,7 @@ View(juvenile_data)
 
 # More work has to be done to retrieve this data!
 # Any idea and suggestion may contribute to the R Community!
+
 
 ################## Study at home ###########################################################################
 # Iterating over multiple files or multiple
