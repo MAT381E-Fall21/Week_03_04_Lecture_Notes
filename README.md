@@ -1,4 +1,4 @@
-#### Week_2_Lecture-Notes: Introduction to Tidyverse Ecosystem
+#### Week_03_Lecture-Notes: Introduction to Tidyverse Ecosystem: Data Importing, Manipulating, and Tidying
 
 There are four `.Rmd/html` files to follow:
  - `intro_tidyverse.Rmd/intro_tidyverse.html`,
