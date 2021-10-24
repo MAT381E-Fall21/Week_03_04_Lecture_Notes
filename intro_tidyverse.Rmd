@@ -57,6 +57,7 @@ class: left
 * Data tidying with `tidyr` package.
   * 03-tidying.Rmd
   
+  
 ---
 class: middle, center
 
@@ -616,13 +617,21 @@ knitr::include_graphics('logo/dplyr.jpeg')
 - The [filter()](https://dplyr.tidyverse.org/reference/filter.html) function is used to **subset the rows** of `data` based on the conditions applied to the column values to determine which rows should be retained.
 - The first argument to this function is the data
 frame and the subsequent arguments are **comparison operators** applied to the columns.
+
+```{r, eval=F}
+#The filter() function is used to subset the rows of .data, 
+#applying the expressions in ... to the column values to determine 
+#which rows should be retained. 
+filter(.data, ...)
+```
+
 - It supports **unquoting** in variable names.
 - Multiple conditions can be applied via **Boolean operators**.
 - More details on [filter()](https://dplyr.tidyverse.org/reference/filter.html).
 
 ---
 
-- Remember the comparison and Boolean operators.
+- Remember the **comparison** and **Boolean** operators.
 
 ```{r echo=FALSE, out.width='90%', fig.cap=''}
 knitr::include_graphics('images/comparison.png') 
@@ -635,12 +644,51 @@ knitr::include_graphics('images/boolean.png')
 - The [select()](https://dplyr.tidyverse.org/reference/select.html) (and optionally `rename()`) select variables in a data frame based on their **column name**.
 - The first argument to this function is the data
 frame and the subsequent arguments are the **columns to keep**.
+
+```{r, eval=F}
+select(.data, ...)
+```
 - Variable names are quoted (or **unquoted**) expression separated by commas.
 - The `select()` keeps only the variable you mention.
-- We can also treat variable names like they are **positions** so that we can use expressions like `x:y` to select range of
-variables.
 - The `rename()` keeps all the variables.
-- It is worth knowing that `dplyr` comes with a number of [select helpers](https://www.rdocumentation.org/packages/dplyr/versions/0.7.2/topics/select_helpers), which are functions that allow us to select columns based on their names. 
+---
+# Overview of selection features
+- Tidyverse selections implement a dialect of R where operators make it easy to select variables:
+
+<br>
+
+```html
+   : for selecting a range of consecutive variables.
+
+   ! for taking the complement of a set of variables.
+
+   & and | for selecting the intersection or the union of two sets of variables.
+
+   c() for combining selections.
+```
+
+---
+- It is worth knowing that `dplyr` comes with a number of [select() helpers](https://www.rdocumentation.org/packages/dplyr/versions/0.7.2/topics/select_helpers), which are functions that allow us to select columns based on their names. 
+- These functions allow you to select variables based on their names.
+
+<br>
+
+```html
+   starts_with(): starts with a prefix.
+
+   ends_with(): ends with a prefix.
+
+   contains(): contains a literal string.
+
+   matches(): matches a regular expression.
+
+   num_range(): a numerical range like x01, x02, x03.
+
+   one_of(): variables in character vector.
+
+   everything(): all variables.
+```
+
 - More details on [select()](https://dplyr.tidyverse.org/reference/select.html).
 
 ---
@@ -648,22 +696,33 @@ variables.
 - The [arrange()](https://dplyr.tidyverse.org/reference/arrange.html) **orders the rows** of a data frame by the values of selected columns. 
 - The first argument to this function is the data
 frame and the subsequent arguments are comma separated list of unquoted variable names, or expressions involving variable names.
-- To sort from highest to lowest value or from Z to A, add `desc()` to `arrange()`
+
+```{r, eval=F}
+arrange(.data, ...)
+```
+
+- To sort from highest to lowest value or from Z to A, add `desc()` to `arrange()`.
 - More details on [arrange()](https://dplyr.tidyverse.org/reference/arrange.html).
 
 ---
 # mutate()
-- The [mutate()](https://dplyr.tidyverse.org/reference/mutate.html) **creates new columns** based on the values in existing columns and preserves existing ones.
+- The [mutate()](https://dplyr.tidyverse.org/reference/mutate.html) **creates new columns** based on the values in existing columns and **preserves** existing ones.
+
+```{r, eval=F}
+mutate(.data, ...)
+```
+
 - The new and edited columns will not permanently be added to the existing data frame -- unless we explicitly save the output.
-- New variables overwrite existing variables of the same name.
+- **New variables** overwrite existing variables of the same name.
 - The `transmute()` adds new variables and drops existing ones.
 - More details on [mutate()](https://dplyr.tidyverse.org/reference/mutate.html).
 
 ---
 # case_when()
-- The `case_when()` allows us to vectorize **multiple** `if_else()` statements.
+- The [case_when()](https://dplyr.tidyverse.org/reference/case_when.html) allows us to vectorize **multiple** `if_else()` statements.
 - It is `R` equivalent of the `SQL CASE WHEN` statement.
 - A sequence of two-sided two sided formulas. LHS determines which values match this case. RHS provides the replacement values. 
+- See the example in `02-manipulating.Rmd`.
 
 ---
 # summarise()
@@ -673,8 +732,14 @@ frame.
 `max()`, `n()`, `sum()`.
 - To use the function we just add our new column name, 
  and after the equal sign the mathematics of what needs to happen, column_name = function(variable).  
-- More info [summarise()](https://dplyr.tidyverse.org/reference/summarise.html).
  
+```{r, eval=F}
+summarise(.data, column_name = function(variable))
+```
+
+- You can add multiple summary functions behind each other.  Here are the most commonly
+used functions:
+
 | Explanation  | Function              | 
 |--------------|-----------------------|
 | Center       | `mean()`, `median()`  | 
@@ -685,15 +750,22 @@ frame.
 | the number of observations | `n()` |
 | the numbers of unique values of the variable | `n_distinct()`|  
 
-- You can add multiple summary functions behind each other.  
+- More info [summarise()](https://dplyr.tidyverse.org/reference/summarise.html).
+
 
 ---
 # group_by()
 - In most cases, we want to get summaries by a group.
-- The `group_by()` is often used together with `summarize()` which takes the column names as arguments that contain the **categorical** variables for which you want
+- The `group_by()` is often used together with `summarise()` which takes the column names as arguments that contain the **categorical** variables for which you want
 to calculate the summary statistics.
+
+```{r, eval=F}
+group_by(.data, ...)
+```
+
+
 - We can also group by multiple columns.
-- More details on [summarise()](https://dplyr.tidyverse.org/reference/summarise.html).
+- More details on [group_by()](https://dplyr.tidyverse.org/reference/group_by.html).
 
 ---
 
@@ -712,7 +784,7 @@ knitr::include_graphics('logo/tidyr.png')
 ---
 # The tidyr package
 
-- [tidyr](https://tidyr.tidyverse.org/) describes a standard way of storing data that is used wherever possible throughout the `Tidyverse ecosystem`.
+- The [tidyr](https://tidyr.tidyverse.org/) package describes a standard way of storing data that is used wherever possible throughout the `Tidyverse ecosystem`.
 - Tidy data is data where: 
    - Every column is variable.
    - Every row is an observation.
@@ -722,10 +794,10 @@ knitr::include_graphics('logo/tidyr.png')
 
 | Function          |  Description                           | 
 |-------------------|----------------------------------------|
-| `pivot_longer()` |lengthens data, increasing the number of rows and decreasing the number of columns|
-| `pivot_wider()`  |The inverse transformation of pivot_longer() |
-| `drop_na()`      |drops rows containing missing values | 
-| `replace_na()`   |replaces NAs with specified values |  
+| `pivot_longer()` |lengthens data, increasing the number of rows and decreasing the number of columns.|
+| `pivot_wider()`  |The inverse transformation of pivot_longer(). |
+| `drop_na()`      |drops rows containing missing values. | 
+| `replace_na()`   |replaces NAs with specified values. |  
 
 - More details on [tidyr](https://tidyr.tidyverse.org/).
 ---
@@ -742,13 +814,9 @@ knitr::include_graphics('images/wilddata.jpeg')
 
 - Similar to the `read_csv()` function used for reading CSV files into `R`, there is a `write_csv()` function that generates CSV files from data frames.
 
-```{r, purl=FALSE, eval=FALSE}
-write_csv(mytidydata, "data_output/mytidydata.csv", row.names = F)
+```{r, eval=FALSE}
+write_csv(cth_data_filtered, "data/cth_data_reduced.csv")
 ```
-
-- By default, `write_csv()` includes a **column with row names** (in our case
-these names are the row numbers), so we need to add `row.names = FALSE` so
-they are not included.    
 
 ---
 

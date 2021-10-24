@@ -1,5 +1,5 @@
 ---
-title: 'Week 03: Examples for Data Manipulating'
+title: 'Week 04: Examples for Data Manipulating'
 ---
 
 # Load tidyverse
@@ -16,13 +16,28 @@ getwd()
 # Read in the data on EPI2020 Results
 # Country scores, 10-year changes, and ranks
 # The data is originally available at https://epi.yale.edu/downloads/epi2020resultsregions20200604.csv
+
+# Download file from web to your local.
+
+```{r, eval=F}
+# download the file into your local computer
+download.file("https://epi.yale.edu/downloads/epi2020resultsregions20200604.csv", "data/epi2020resultsregions20200604.csv")
+```
+
+# Read in the data into R environment
+
+```{r}
+epi_data <- read_csv("data/epi2020resultsregions20200604.csv") 
+```
+
 # Click on the epi_data variable in the "Environment" tab or
 # Run the View() function.
 
 ```{r}
-epi_data <- read_csv("data/epi2020resultsregions20200604.csv") 
 View(epi_data)
 ```
+
+# or structure
 
 ```{r}
 str(epi_data)
@@ -34,10 +49,9 @@ str(epi_data)
 
 #### Filter() ####
 
-# filter() lets us to apply comparison 
-# operators to subset data.
-# We can filter character variables based on their values. 
+# filter() lets us to subset data via based on some filter conditions.
 
+# We can filter character variables based on their values. 
 # Let's filter Eastern European countries from the data.
 # region is a character variable
 
@@ -47,11 +61,12 @@ epi_data %>%
   View()
 ```
 
-
-# Similarly we can use the other operators:
-# Exclude Eastern European countries from the data.
 # Remember %>% operator does not save the object, you need
-# to assign RHS to LHS.
+# to assign RHS to an object at the LHS.
+
+# Similarly we can use the other "comparison operators":
+# Exclude Eastern European countries from the data.
+
 
 ```{r}
 epi_data %>% 
@@ -71,7 +86,7 @@ epi_data %>%
 
 # We can use the %in% operator to deselect certain groups as well, 
 # in this case we have to negate by adding an exclamation mark (Boolean operator)
-# at the beginning of your filter.
+# at the beginning of our filter condition.
 
 ```{r}
 epi_data %>%
@@ -93,10 +108,11 @@ epi_data %>%
 ```
 
 # Multiple conditions
-# filter(condition1, condition2) will return rows where both conditions are met.
+# filter(condition1, condition2) will return rows where "both conditions" are met.
 # Let's combine multiple conditions in the same call.
 
-# Filter countries whose EPI.new score is between 50 and 60!..   2) 50 <= EPI  & 1)EPI <= 60
+# Filter countries whose EPI.new score is between 50 and 60!..   
+# 50 <= EPI.new & EPI.new <= 60.
 
 
 ```{r}
@@ -105,14 +121,13 @@ epi_data %>%
    View()
 ```
 
-# or use helper function between() 
+# or use "helper function" between(): 
 
 ```{r}
 epi_data %>%
   filter(between(EPI.new, 50, 60)) %>%
    View()
 ```
-
 
 # Filter Eastern Eruropean countries whose EPI.new score is less than 
 # or equal to 50!..
@@ -127,11 +142,11 @@ epi_data %>%
 
 ```{r}
 epi_data %>%
-  filter(region == "Eastern Europe" , EPI.new <= 50) %>%
+  filter(region == "Eastern Europe", EPI.new <= 50) %>%
    View()
 ```
 
-# Filter Asia-Pacific countries whos EPI score is greater than the grand mean.
+# Filter Asia-Pacific countries whose EPI score is greater than the grand mean.
 
 
 ```{r}
@@ -154,11 +169,11 @@ epi_data %>%
 # Make sure to use parentheses when combining several logical operators 
 # to indicate which logical operation should be performed first.
 
+
 # Practice at home!
 # To filter out empty rows, you negate the is.na() function inside a filter:
 # The sample code will remove any rows where the specified column is NA.
 
-# Revisit : At home: 
 
 ```{r}
 cth_data <- read_csv("data/CTH_raw_na.csv") 
@@ -169,10 +184,12 @@ View(cth_data)
 dim(cth_data)
 ```
 
+### Caution!!! Discuss with students
 
 ```{r}
 cth_data_filtered <- cth_data %>%
-                     filter(is.na(CTH.raw.1950))
+                     filter(!is.na(CTH.raw.1950)) 
+View(cth_data_filtered)
 ```
 
 ```{r}
@@ -186,7 +203,6 @@ dim(cth_data_filtered)
 # The order in which you add them, will determine the order in which 
 # they appear in the output.
 
-
 ```{r}
 epi_data %>%
   select(code, iso, country, region, EPI.new, AIR.new) %>%
@@ -194,7 +210,7 @@ epi_data %>%
 ```
 
 
-# We can select multiple columns using the (from:to) syntax:
+# We can select multiple columns using the (from:to) operator:
 
 ```{r}
 epi_data %>%
@@ -204,8 +220,28 @@ epi_data %>%
 
 # A side note:
 # ! for taking the complement of a set of variables.
+
+```{r}
+epi_data %>%
+  select(!code:AIR.new) %>%
+  View()
+```
+
+# For selecting non-consecutive variables, we can use the followings:
 # & and | for selecting the intersection or the union of two sets of variables.
 # c() for combining selections.
+
+```{r}
+epi_data %>%
+  select(code:iso & iso:EPI.new) %>%
+  View()
+```
+
+```{r}
+epi_data %>%
+  select(code:iso | iso:EPI.new) %>%
+  View()
+```
 
 
 # We can also deselect (multiple) columns
@@ -229,23 +265,22 @@ epi_data %>%
 
 ```{r}
 epi_data %>%
-  select(code, iso, country, region, starts_with("AIR")) %>%
+  select(code:region, starts_with("AIR")) %>%
   View()
 ```
 
 
 ```{r}
 epi_data %>%
-  select(code, iso, country, region, ends_with("new")) %>%
+  select(code:region, ends_with("new")) %>%
   View()
 ```
 
 ```{r}
 my_Reduced <- epi_data %>% 
-              select(code, iso, country, region, contains("EPI")) 
+              select(code:region, contains("EPI")) 
 View(my_Reduced)            
 ```
-
 
 # Or use a variable for column selection:
 # You can set up column names upfront, and 
@@ -254,31 +289,33 @@ View(my_Reduced)
 
 ```{r}
 columns <- c("code", "iso", "country", "region", "EPI.new", "AIR.new")  
+
 epi_data %>% 
   select(one_of(columns)) %>% 
+  #select(!!(columns)) %>% #the same with previous command
   View()
 ```
 
 #everything() within select(), selects everything
 
-```{r}
+```{r, eval=F}
+### caution: did not work!!!
 columns <- c("code", "iso", "country", "region", "EPI.new", "AIR.new")  
 
 epi_data %>%
-  ##select(one_of(columns)) %>%
-  select(!!(columns)) %>% #the same with previous command
+ select(everything(columns)) %>%
  View()
 ```
   
 # If you will be using a select() statement, you can rename straight in the select function.
 
-
 ```{r}
 epi_data %>%
-  select(code, iso, country, region, EPI = EPI.new, AIR = AIR.new) %>%
+  select(code:region, EPI = EPI.new, AIR = AIR.new) %>%
   View()
 ```
 
+# Alternatively:
 # rename() renames column names.
 # The new variable names goes on the LHS of the = sign, 
 # and the old name on the RHS.
@@ -286,7 +323,7 @@ epi_data %>%
 
 ```{r}
 epi_data %>%
-  select(code, iso, country, region, EPI.new, AIR.new) %>%
+  select(code:region, EPI.new, AIR.new) %>%
   rename(EPI = EPI.new, AIR = AIR.new) %>%
   View()
 ```
@@ -307,13 +344,6 @@ epi_data %>%
 ```
 
 # Sort the data according to the EPI.new variable in descending order
-
-```{r}
-epi_data %>%
-  arrange(-EPI.new)
-  View()
-```
-
 # or use desc() within arrange()
 
 ```{r}
@@ -322,13 +352,20 @@ epi_data %>%
   View()
 ```
 
+# Sort the data according to the EPI.new variable in descending order
+
+```{r}
+## caution: did not work!!!
+epi_data %>%
+  arrange(-EPI.new)
+  View()
+```
 
 #### Mutate() ####
 
-# You can make new columns with the mutate() function. 
+# We can make new columns with the mutate() function. 
 # The options inside mutate are "almost endless": pretty much anything that 
 # you can do to normal vectors, can be done inside a mutate() function.
-
 # Anything inside mutate can either be a new column (by giving mutate a new column name),
 # or can replace the current column (by keeping the same column name).
 
@@ -337,7 +374,7 @@ epi_data %>%
 ```{r}
 epi_data %>%
   mutate(EPI.stand = (EPI.new-mean(EPI.new))/sd(EPI.new)) %>%
-  select(code, iso, country, EPI.stand) %>%
+  select(code:country, EPI.stand) %>%
   View()
 ```
 
@@ -380,7 +417,6 @@ epi_data %>%
 ```
 
 
-
 #### Summarize() ####
 
 # If we just want to produce summaries of 
@@ -402,6 +438,7 @@ epi_data %>%
 
 
 ```{r}
+## can you guess the dimension of the output?
 epi_data %>%
   summarize(nrow = n(), avgEPI = mean(EPI.new), sdHLT = sd(HLT.new), maxAIR = max(AIR.new)) %>%
   View()
@@ -421,11 +458,9 @@ epi_data %>%
 # Then we use summarize to do some sort of summary calculation 
 # (such as counting or calculating the mean) on these smaller data.frames:
 
+
 # Calculate the average EPI.new scores across regions and the number of
-# countries in each region. Then sort the data according to
-# average EPI score in descending order.
-
-
+# countries in each region. 
 
 ```{r}
 epi_data %>%
@@ -442,6 +477,8 @@ epi_data %>%
   View()
 ```
 
+# Then sort the data according to
+# average EPI score in descending order.
 
 ```{r}
 epi_data %>%
@@ -451,7 +488,7 @@ epi_data %>%
   View()
 ```
 
-
+# Calculate the proportion of countries in each region.
 
 ```{r}
 epi_data %>%

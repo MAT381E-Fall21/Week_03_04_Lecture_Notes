@@ -1,5 +1,5 @@
 ---
-title: 'Week 03: Examples for Data Tidying'
+title: 'Week 04: Examples for Data Tidying'
 ---
 
 
@@ -31,7 +31,7 @@ str(pop_red)
 
 # Did you notice any problem?
 
-# The variables 1989-2015 are character variables
+# The variables 1989-2019 are character variables
 # What is the reason for it? 
 # Actually they should have been numeric!..
 
@@ -40,7 +40,7 @@ str(pop_red)
 # viewer panel.
 # We do not need the second column.
 
-# First drop all the rows which are completely missing
+# First drop all the rows which are "completely missing".
 
 # drop_na() drops rows which are missing at all columns--complete case analysis
 
@@ -57,14 +57,14 @@ str(pop_red_tidy)
 
 
 # Rename the first column as "Country", drop the second column, and
-# sorty by Country
+# sort by Country
 
 
 ```{r}
 pop_red_tidy_more <- pop_red_tidy %>%
                       drop_na() %>% 
-                      rename("Country"="...1") %>%
-                      select(-"...2") %>% 
+                      rename(Country = "...1") %>%
+                      select(-"...2") %>% #unquoted ...2 is also OK, but has low readability.
                       arrange(Country) 
             
 View(pop_red_tidy_more)
@@ -80,9 +80,10 @@ str(pop_red_tidy_more)
 # We need to replace "-" with "NA".
 
 ```{r}
+# read na_if() as: if "-", then it is na
 pop_red_withna <- pop_red_tidy_more %>% 
-                  na_if("-") #from dplyr
-
+                  na_if("-")  #from dplyr 
+  
 View(pop_red_withna)
 ```
 
@@ -91,11 +92,12 @@ str(pop_red_withna)
 ```
 
 # Except the Country column, convert character variables
-# into numeric variables
+# into numeric variables with mutate_
 
 ```{r}
 pop_red_tidy_tidy <- pop_red_withna %>% 
-                     mutate_at(vars("1989":"2019"), as.numeric) 
+                     #mutate_at(vars(1989:2019), as.numeric) #not works
+                     mutate_at(vars("1989":"2019"), as.numeric) #not as.numeric(), () drops
 str(pop_red_tidy_tidy)
 ``` 
 
@@ -104,10 +106,13 @@ str(pop_red_tidy_tidy)
 View(pop_red_tidy_tidy)                  
 ```                    
 
+# Lastly, this data is in wide format.
+# Turn this data into long format so that
+# we can use it later (for visualization etc)
 
-# Lastly, turn this data into long format so that
-# We can use it later (for visualization etc)
-
+# except country variable, take the columns, add column
+# names (values) to under a new column named "Year", and
+# assign the values to another column named "Population".
 
 ```{r}
 pop_red_long <- pop_red_tidy_tidy %>% 
