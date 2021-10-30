@@ -4,7 +4,8 @@ title: 'Week 03: Examples for Data Importing'
 ---
 
 # Load packages
-```{r}
+```{r, warning=F, message=F}
+library(tidyverse)
 library(readr)
 library(readxl)
 ```
@@ -15,6 +16,13 @@ library(readxl)
 ```{r}
 getwd()
 ```
+
+
+```{r}
+cth_data <- read_csv("data/CTH_raw_na.csv")
+```
+
+
 
 # Visit Environmental Performance Index at https://epi.yale.edu/
 
@@ -159,7 +167,10 @@ excel_sheets("data/Population-1989-2019.xlsx")
 # read_excel() reads both xls and xlsx files and detects the format from the extension.
 
 ```{r}
-pop <- read_excel("data/Population-1989-2019.xlsx")
+pop <- read_excel("data/Population-1989-2019.xlsx", range= cell_rows(5:40))
+```
+
+```{r}
 View(pop)
 ```
 
@@ -171,6 +182,21 @@ View(pop)
 # By default, it prints the first sheet
 pop_red <- read_excel("data/Population-1989-2019.xlsx", range = cell_rows(5:40))
 View(pop_red)
+```
+
+
+```{r}
+colnames(pop)[1:2] <- c("Country", "Number")
+```
+
+
+
+```{r}
+colnames(pop)[-(1:2)] <- paste("y", 1989:2019, sep="")
+```
+
+```{r}
+View(pop)
 ```
 
 ```{r}

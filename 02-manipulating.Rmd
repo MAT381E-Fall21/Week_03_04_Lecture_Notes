@@ -19,6 +19,8 @@ getwd()
 
 # Download file from web to your local.
 
+"
+
 ```{r, eval=F}
 # download the file into your local computer
 download.file("https://epi.yale.edu/downloads/epi2020resultsregions20200604.csv", "data/epi2020resultsregions20200604.csv")
@@ -61,6 +63,7 @@ epi_data %>%
   View()
 ```
 
+
 # Remember %>% operator does not save the object, you need
 # to assign RHS to an object at the LHS.
 
@@ -84,11 +87,13 @@ epi_data %>%
   View()
 ```
 
+
 # We can use the %in% operator to deselect certain groups as well, 
 # in this case we have to negate by adding an exclamation mark (Boolean operator)
 # at the beginning of our filter condition.
 
 ```{r}
+#not works with -
 epi_data %>%
   filter(!region %in% c("Asia-Pacific", "Eastern Europe")) %>%
    View()
@@ -101,11 +106,14 @@ epi_data %>%
 # or equal to 50!..
 
 
+
 ```{r}
 epi_data %>%
   filter(EPI.new <= 50) %>%
    View()
 ```
+
+
 
 # Multiple conditions
 # filter(condition1, condition2) will return rows where "both conditions" are met.
@@ -115,11 +123,13 @@ epi_data %>%
 # 50 <= EPI.new & EPI.new <= 60.
 
 
+
 ```{r}
 epi_data %>%
   filter(50 <= EPI.new & EPI.new <= 60) %>%
    View()
 ```
+
 
 # or use "helper function" between(): 
 
@@ -145,6 +155,7 @@ epi_data %>%
   filter(region == "Eastern Europe", EPI.new <= 50) %>%
    View()
 ```
+
 
 # Filter Asia-Pacific countries whose EPI score is greater than the grand mean.
 
@@ -186,6 +197,17 @@ dim(cth_data)
 
 ### Caution!!! Discuss with students
 
+
+Eğer cth_raw_1950 kolonunda missing varsa, veriden çıkar
+
+
+```{r}
+cth_data %>% 
+  filter(!is.na(CTH.raw.1950)) %>% 
+  View()
+```
+
+
 ```{r}
 cth_data_filtered <- cth_data %>%
                      filter(!is.na(CTH.raw.1950)) 
@@ -203,6 +225,8 @@ dim(cth_data_filtered)
 # The order in which you add them, will determine the order in which 
 # they appear in the output.
 
+
+
 ```{r}
 epi_data %>%
   select(code, iso, country, region, EPI.new, AIR.new) %>%
@@ -218,6 +242,7 @@ epi_data %>%
   View()
 ```
 
+
 # A side note:
 # ! for taking the complement of a set of variables.
 
@@ -230,6 +255,7 @@ epi_data %>%
 # For selecting non-consecutive variables, we can use the followings:
 # & and | for selecting the intersection or the union of two sets of variables.
 # c() for combining selections.
+
 
 ```{r}
 epi_data %>%
@@ -247,6 +273,15 @@ epi_data %>%
 # We can also deselect (multiple) columns
 # by adding a minus sign in front of the column name. 
 # You can also deselect blocks of columns.
+
+
+```{r}
+# negative sign works with !
+epi_data %>% 
+  select(-code) %>% 
+  View()
+```
+
 
 
 ```{r}
@@ -337,6 +372,15 @@ epi_data %>%
 
 # Sort the data according to the EPI.new variable in ascending order
 
+
+```{r}
+epi_data %>% 
+  arrange(desc(EPI.new)) %>% 
+  View()
+```
+
+
+
 ```{r}
 epi_data %>% 
   arrange(EPI.new) %>% 
@@ -371,6 +415,9 @@ epi_data %>%
 
 # Let's standardize the EPI.new variable
 
+
+
+
 ```{r}
 epi_data %>%
   mutate(EPI.stand = (EPI.new-mean(EPI.new))/sd(EPI.new)) %>%
@@ -384,6 +431,7 @@ epi_data %>%
 # into a categoric one with two levels. 
 # ifelse() takes a logical expression, then what to do if the expression 
 # returns TRUE and lastly what to do when it returns FALSE.
+
 
 
 ```{r}
@@ -401,10 +449,6 @@ epi_data %>%
 # "The arguments are evaluated in order", so only the rows where the first statement 
 # is not true will continue to be evaluated for the next statement. 
 # For everything that is left at the end just use the TRUE ~ "newname".
-
-EPI.cat such that EPI.new >= 75, "Very Good"
-                  EPI.new >= 50, "Good"
-                  EPI.new < 50, "Not Good"
 
 
 ```{r}
@@ -435,6 +479,14 @@ epi_data %>%
 # n(): gives the number of observations
 # n_distinct(): gives the numbers of unique values of the variable.
 # You can add multiple summary functions behind each other.
+
+
+```{r}
+epi_data %>% 
+  summarize(nds = n_distinct(region)) %>% 
+  View()
+```
+
 
 
 ```{r}

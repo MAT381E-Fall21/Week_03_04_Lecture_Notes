@@ -57,7 +57,6 @@ class: left
 * Data tidying with `tidyr` package.
   * 03-tidying.Rmd
   
-  
 ---
 class: middle, center
 
